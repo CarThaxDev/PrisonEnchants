@@ -62,7 +62,8 @@ public class Util {
                 }
             }
             lore.add(ChatColor.GREEN + "Level: " + currentLevel + "/" + enchant.maxLevel);
-            lore.add(ChatColor.GREEN + "Cost: " + ChatColor.GOLD + enchant.price);
+            double exponent = ((enchant.price/enchant.maxLevel)/1000) + 1;
+            lore.add(ChatColor.GREEN + "Cost: " + ChatColor.GOLD + Math.floor(enchant.price * Math.pow(exponent, Integer.parseInt(currentLevel))));
             meta.setLore(lore);
             item.setItemMeta(meta);
             inventory.setItem(enchant.slot, item);

@@ -77,10 +77,10 @@
         </dependency>
         <dependency>
             <groupId>com.github.CarThax08</groupId>
-            <artifactId>PrisonCore</artifactId>
+            <artifactId>servercore</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/dependencies/PrisonCore.jar</systemPath>
+            <systemPath>${project.basedir}/lib/PrisonCore.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.sk89q.worldguard</groupId>
