@@ -1,0 +1,10 @@
+name: PrisonEnchants
+version: '${project.version}'
+main: com.github.carthax08.prisonenchants.PluginMain
+api-version: 1.19
+authors: [ CarThax ]
+description: Custom enchants plugin for NovaPrisons
+commands:
+  enchants:
+    description: Open the custom enchants GUI
+    usage: /enchants

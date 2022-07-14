@@ -1,0 +1,7 @@
+keys:
+  mercury:
+    command: "cc give physical mercury 1 %player%"
+    chance: 50
+  venus:
+    command: "cc give physical venus 1 %player%"
+    chance: 50
