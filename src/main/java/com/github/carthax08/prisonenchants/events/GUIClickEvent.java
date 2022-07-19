@@ -92,6 +92,11 @@ public class GUIClickEvent implements Listener {
                 player.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 5f, 5f);
                 Util.startDebounce(player, 5);
                 Players.setTokens(player, tokens - cost);
+                /*
+                Just reloads GUI because I can't be bothered to figure out how to make prices increment
+                with the way it goes rn. I mean seriously, it charges based off LORE?? ewwwww
+                */
+                Util.openEnchantGui(((Player) event.getWhoClicked()).getPlayer());
             }
         }
     }

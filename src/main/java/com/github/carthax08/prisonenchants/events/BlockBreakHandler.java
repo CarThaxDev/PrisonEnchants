@@ -90,6 +90,159 @@ public class BlockBreakHandler implements Listener {
                 if (stripped.toLowerCase().contains("tokenator")) {
                     tokenatorLevel = Integer.parseInt(stripped.toLowerCase().replace("tokenator ", ""));
                 }
+                if(stripped.toLowerCase().contains("laser")) {
+                    System.out.println("Laser found");
+                    int currentLevel = Integer.parseInt(stripped.toLowerCase().replace("laser ", ""));
+                    System.out.println(currentLevel);
+                    boolean proc = new Random().nextInt(1, 1000) > (1000 - Math.max(1, (100 * currentLevel/CustomEnchant.LASER.maxLevel)));
+                    if (proc) {
+                        double yaw = e.getPlayer().getLocation().getYaw();
+                        List<Block> blocks = new ArrayList<>();
+                        blocks.add(e.getBlock());
+                        Location locPlus = new Location(e.getBlock().getWorld(), e.getBlock().getX(), e.getBlock().getY(), e.getBlock().getZ());
+                        Location locMinus = new Location(e.getBlock().getWorld(), e.getBlock().getX(), e.getBlock().getY(), e.getBlock().getZ());
+                        if ((yaw <= 45) || (yaw > 135 && yaw <= 225) || (yaw > 315) ) {
+                            while (true) {
+                                locPlus.setZ(locPlus.getZ()+1);
+                                Block newBlock = locPlus.getBlock();
+                                if (newBlock.getType() == Material.BEDROCK) {
+                                    break;
+                                }
+                                blocks.add(newBlock);
+                            }
+                            while (true) {
+                                locMinus.setZ(locMinus.getZ()-1);
+                                Block newBlock = locMinus.getBlock();
+                                if (newBlock.getType() == Material.BEDROCK) {
+                                    break;
+                                }
+                                blocks.add(newBlock);
+                            }
+                        } else if ((yaw > 45 && yaw <= 135 ) || (yaw > 225 && yaw <= 315)) {
+                            while (true) {
+                                locPlus.setX(locPlus.getX()+1);
+                                Block newBlock = locPlus.getBlock();
+                                if (newBlock.getType() == Material.BEDROCK) {
+                                    break;
+                                }
+                                blocks.add(newBlock);
+                            }
+                            while (true) {
+                                locMinus.setX(locMinus.getX()-1);
+                                Block newBlock = locMinus.getBlock();
+                                if (newBlock.getType() == Material.BEDROCK) {
+                                    break;
+                                }
+                                blocks.add(newBlock);
+                            }
+                        }
+                        for (Block b : blocks) {
+                            Location yPlus = new Location(b.getWorld(), b.getX(), b.getY(), b.getZ());
+                            Location yMinus = new Location(b.getWorld(), b.getX(), b.getY(), b.getZ());
+                            while (true) {
+                                yPlus.setY(locPlus.getY()+1);
+                                Block newBlock = locPlus.getBlock();
+                                if (newBlock.getType() == Material.BEDROCK) {
+                                    break;
+                                }
+                                blocks.add(newBlock);
+                            }
+                            while (true) {
+                                yMinus.setY(locMinus.getY()-1);
+                                Block newBlock = yMinus.getBlock();
+                                if (newBlock.getType() == Material.BEDROCK) {
+                                    break;
+                                }
+                                blocks.add(newBlock);
+                            }
+                        }
+                        List<ItemStack> items = new ArrayList<>();
+                        for (Block b : blocks) {
+                            tokenBlocks.add(b);
+                            items.addAll(b.getDrops());
+                            b.setType(Material.AIR);
+                        }
+                        for (ItemStack item : items) {
+                            item.setAmount(item.getAmount() * meta.getEnchantLevel(Enchantment.LOOT_BONUS_BLOCKS));
+                            DataStore.getPlayerData(e.getPlayer()).addItemToBackpack(item);
+                        }
+                    }
+                }
+                if(stripped.toLowerCase().contains("multidirectional")) {
+                    System.out.println("multidirectional found");
+                    int currentLevel = Integer.parseInt(stripped.toLowerCase().replace("multidirectional ", ""));
+                    System.out.println(currentLevel);
+                    boolean proc = new Random().nextInt(1, 1000) > (1000 - Math.max(1, (100 * currentLevel/CustomEnchant.LASER.maxLevel)));
+                    if (proc) {
+                        double yaw = e.getPlayer().getLocation().getYaw();
+                        List<Block> blocks = new ArrayList<>();
+                        blocks.add(e.getBlock());
+                        Location locPlus = new Location(e.getBlock().getWorld(), e.getBlock().getX(), e.getBlock().getY(), e.getBlock().getZ());
+                        Location locMinus = new Location(e.getBlock().getWorld(), e.getBlock().getX(), e.getBlock().getY(), e.getBlock().getZ());
+                        while (true) {
+                            locPlus.setZ(locPlus.getZ()+1);
+                            Block newBlock = locPlus.getBlock();
+                            if (newBlock.getType() == Material.BEDROCK) {
+                                break;
+                            }
+                            blocks.add(newBlock);
+                        }
+                        while (true) {
+                            locMinus.setZ(locMinus.getZ()-1);
+                            Block newBlock = locMinus.getBlock();
+                            if (newBlock.getType() == Material.BEDROCK) {
+                                break;
+                            }
+                            blocks.add(newBlock);
+                        }
+                        while (true) {
+                            locPlus.setX(locPlus.getX()+1);
+                            Block newBlock = locPlus.getBlock();
+                            if (newBlock.getType() == Material.BEDROCK) {
+                                break;
+                            }
+                            blocks.add(newBlock);
+                        }
+                        while (true) {
+                            locMinus.setX(locMinus.getX()-1);
+                            Block newBlock = locMinus.getBlock();
+                            if (newBlock.getType() == Material.BEDROCK) {
+                                break;
+                            }
+                            blocks.add(newBlock);
+                        }
+                        for (Block b : blocks) {
+                            Location yPlus = new Location(b.getWorld(), b.getX(), b.getY(), b.getZ());
+                            Location yMinus = new Location(b.getWorld(), b.getX(), b.getY(), b.getZ());
+                            while (true) {
+                                yPlus.setY(locPlus.getY()+1);
+                                Block newBlock = locPlus.getBlock();
+                                if (newBlock.getType() == Material.BEDROCK) {
+                                    break;
+                                }
+                                blocks.add(newBlock);
+                            }
+                            while (true) {
+                                yMinus.setY(locMinus.getY()-1);
+                                Block newBlock = yMinus.getBlock();
+                                if (newBlock.getType() == Material.BEDROCK) {
+                                    break;
+                                }
+                                blocks.add(newBlock);
+                            }
+                        }
+                        List<ItemStack> items = new ArrayList<>();
+                        for (Block b : blocks) {
+                            tokenBlocks.add(b);
+                            items.addAll(b.getDrops());
+                            b.setType(Material.AIR);
+                        }
+                        for (ItemStack item : items) {
+                            item.setAmount(item.getAmount() * meta.getEnchantLevel(Enchantment.LOOT_BONUS_BLOCKS));
+                            DataStore.getPlayerData(e.getPlayer()).addItemToBackpack(item);
+                        }
+                    }
+                }
                 if(stripped.toLowerCase().contains("jackhammer")){
                     System.out.println("Jackhammer found");
                     int currentLevel = Integer.parseInt(stripped.toLowerCase().replace("jackhammer ", ""));
