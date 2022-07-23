@@ -80,7 +80,7 @@
             <artifactId>servercore</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/PrisonCore.jar</systemPath>
+            <systemPath>${project.basedir}/dependencies/PrisonCore.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.sk89q.worldguard</groupId>

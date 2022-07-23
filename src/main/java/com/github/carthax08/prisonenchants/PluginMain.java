@@ -5,12 +5,16 @@ import com.github.carthax08.prisonenchants.events.BlockBreakHandler;
 import com.github.carthax08.prisonenchants.events.GUIClickEvent;
 import com.github.carthax08.prisonenchants.events.PlayerInteractHandler;
 import com.github.carthax08.prisonenchants.util.Util;
+import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.naming.Name;
 import java.util.logging.Logger;
 
 public final class PluginMain extends JavaPlugin {
+    public static NamespacedKey costKey;
+    public static NamespacedKey typeKey;
 
     private static PluginMain instance;
 
@@ -29,6 +33,8 @@ public final class PluginMain extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerInteractHandler(), this);
         getServer().getPluginManager().registerEvents(new BlockBreakHandler(), this);
         getConfig().options().copyDefaults();
+        costKey = new NamespacedKey(this, "cost");
+        typeKey = new NamespacedKey(this, "type");
         saveDefaultConfig();
         Util.loadKeyChances(getConfig());
     }

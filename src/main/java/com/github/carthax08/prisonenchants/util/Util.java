@@ -4,6 +4,7 @@ import com.github.carthax08.prisonenchants.PluginMain;
 import com.github.carthax08.prisonenchants.util.enums.CustomEnchant;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
@@ -11,14 +12,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Vector;
 
 public class Util {
-    public static final ArrayList<Player> debounce = new ArrayList<>();
+    public static final Vector<Player> debounce = new Vector<>();
     public static final HashMap<Integer, String> crateCommandMap = new HashMap<>();
 
     public static void startDebounce(Player player, long ticks){
@@ -43,27 +47,19 @@ public class Util {
             List<String> lore = new ArrayList<>();
             lore.add(ChatColor.translateAlternateColorCodes('&', enchant.description));
             ItemMeta mainHandMeta = player.getInventory().getItemInMainHand().getItemMeta();
-            String currentLevel = "";
-            if(!mainHandMeta.hasLore()){
-                currentLevel = "0";
-            }else if(enchant == CustomEnchant.FORTUNE){
-                currentLevel = String.valueOf(mainHandMeta.getEnchantLevel(Enchantment.LOOT_BONUS_BLOCKS));
-            }else {
-                for (String string : mainHandMeta.getLore()) {
-                    if(string.contains(enchant.displayName)){
-                        string = ChatColor.stripColor(string);
-                        string = string.replace(enchant.displayName + " ", "");
-                        currentLevel = string;
-                        break;
-                    }
-                }
-                if(currentLevel.equals("")){
-                    currentLevel = "0";
-                }
+            int currentLevel;
+            NamespacedKey key = new NamespacedKey(PluginMain.getInstance(), enchant.name().toLowerCase() + ".level");
+            if(enchant == CustomEnchant.FORTUNE){
+                currentLevel = mainHandMeta.getEnchantLevel(Enchantment.LOOT_BONUS_BLOCKS);
+            }else{
+                PersistentDataContainer container = mainHandMeta.getPersistentDataContainer();
+                currentLevel = container.has(key, PersistentDataType.INTEGER) ? container.get(key, PersistentDataType.INTEGER) : 0;
             }
             lore.add(ChatColor.GREEN + "Level: " + currentLevel + "/" + enchant.maxLevel);
-            double exponent = ((enchant.price/enchant.maxLevel)/1000) + 1;
-            lore.add(ChatColor.GREEN + "Cost: " + ChatColor.GOLD + Math.floor(enchant.price * Math.pow(exponent, Integer.parseInt(currentLevel))));
+            lore.add(ChatColor.GREEN + "Cost: " + ChatColor.GOLD + enchant.price);
+            PersistentDataContainer container = meta.getPersistentDataContainer();
+            container.set(PluginMain.costKey, PersistentDataType.INTEGER, enchant.price);
+            container.set(PluginMain.typeKey, PersistentDataType.STRING, enchant.name());
             meta.setLore(lore);
             item.setItemMeta(meta);
             inventory.setItem(enchant.slot, item);

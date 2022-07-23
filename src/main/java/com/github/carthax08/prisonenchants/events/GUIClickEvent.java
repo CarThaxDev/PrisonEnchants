@@ -1,9 +1,11 @@
 package com.github.carthax08.prisonenchants.events;
 
+import com.github.carthax08.prisonenchants.PluginMain;
 import com.github.carthax08.prisonenchants.util.Util;
 import com.github.carthax08.prisonenchants.util.enums.CustomEnchant;
 import com.github.carthax08.servercore.api.Players;
 import org.bukkit.ChatColor;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -13,6 +15,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,18 +31,11 @@ public class GUIClickEvent implements Listener {
             }
             Player player = (Player) event.getWhoClicked();
             double tokens = Players.getTokens(player);
-            double cost = 0;
-            String enchantName = ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName());
-            System.out.println(enchantName);
-            for (String string : event.getCurrentItem().getItemMeta().getLore()){
-                string = ChatColor.stripColor(string);
-                if(string.contains("Cost:")){
-                    string = string.replace("Cost: ", "");
-                    cost = Double.parseDouble(string);
-                }
-            }
+            PersistentDataContainer container = event.getCurrentItem().getItemMeta().getPersistentDataContainer();
+            String enchantName = container.get(PluginMain.typeKey, PersistentDataType.STRING);
+            int cost = container.get(PluginMain.costKey, PersistentDataType.INTEGER);
             if(cost == 0){
-                System.out.println("An error occured while a player tried to enchant their item! There was no cost set for the enchant!");
+                System.out.println("An error occurred while a player tried to enchant their item! There was no cost set for the enchant!");
                 return;
             }
             if(tokens <= cost){
@@ -56,12 +53,24 @@ public class GUIClickEvent implements Listener {
                     meta.setLore(lore);
                 }
                 int level = 0;
+                NamespacedKey key = new NamespacedKey(PluginMain.getInstance(), enchantName.toLowerCase() + ".level");
                 if(enchantName.equalsIgnoreCase("Fortune")){
-                    System.out.println("1");
                     level = meta.getEnchantLevel(Enchantment.LOOT_BONUS_BLOCKS) + 1;
-                    System.out.println(level);
                     meta.removeEnchant(Enchantment.LOOT_BONUS_BLOCKS);
+                    if(level > CustomEnchant.valueOf(enchantName.toUpperCase().replace(" ", "_")).maxLevel){
+                        player.sendMessage(ChatColor.RED + "That is already at the max level!");
+                        player.playSound(player, Sound.BLOCK_NOTE_BLOCK_BASS, 5f, 5f);
+                        return;
+                    }
                     meta.addEnchant(Enchantment.LOOT_BONUS_BLOCKS, level, true);
+                }else{
+                    level = container.has(key, PersistentDataType.INTEGER) ? container.get(key, PersistentDataType.INTEGER) : 0;
+                    if(level > CustomEnchant.valueOf(enchantName.toUpperCase().replace(" ", "_")).maxLevel){
+                        player.sendMessage(ChatColor.RED + "That is already at the max level!");
+                        player.playSound(player, Sound.BLOCK_NOTE_BLOCK_BASS, 5f, 5f);
+                        return;
+                    }
+                    container.set(key, PersistentDataType.INTEGER, level + 1);
                 }
                 List<String> lore;
                 if(meta.hasLore()){
@@ -69,33 +78,14 @@ public class GUIClickEvent implements Listener {
                 }else{
                     lore = new ArrayList<>();
                 }
-                List<String> iteratorList = new ArrayList<>(lore);
-                for(String string : iteratorList){
-                    String oldString = string;
-                    string = ChatColor.stripColor(string);
-                    if(string.contains(enchantName)){
-                        if (level == 0) {
-                            level = Integer.parseInt(string.replace(enchantName + " ", "")) + 1;
-                        }
-                        lore.remove(oldString);
-                    }
-                }
+
                 if(level == 0) level = 1;
-                if(level > CustomEnchant.valueOf(enchantName.toUpperCase().replace(" ", "_")).maxLevel){
-                    player.sendMessage(ChatColor.RED + "That is already at the max level!");
-                    player.playSound(player, Sound.BLOCK_NOTE_BLOCK_BASS, 5f, 5f);
-                    return;
-                }
                 lore.add(ChatColor.RESET + "" + ChatColor.GRAY + enchantName + " " + level);
                 meta.setLore(lore);
                 item.setItemMeta(meta);
                 player.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 5f, 5f);
                 Util.startDebounce(player, 5);
                 Players.setTokens(player, tokens - cost);
-                /*
-                Just reloads GUI because I can't be bothered to figure out how to make prices increment
-                with the way it goes rn. I mean seriously, it charges based off LORE?? ewwwww
-                */
                 Util.openEnchantGui(((Player) event.getWhoClicked()).getPlayer());
             }
         }
